@@ -1,58 +1,49 @@
-import React from 'react'
-import ReactDom from 'react-dom'
-import SeasonDisplay from './SeasonDisplay'
-import Spinner from './Spinner'
+import React from "react";
+import ReactDom from "react-dom";
+import SeasonDisplay from "./SeasonDisplay";
+import Spinner from "./Spinner";
+import useLocation from "./useLocation";
 
-class App extends React.Component {
+const App = () => {
+  const [lat, errorMessage] = useLocation();
 
-    state = { lat: null, erroMessage:'' }
+  let content;
+  if (errorMessage) {
+    content = <div>Error:{errorMessage}</div>;
+  } else if (lat) {
+    content = <SeasonDisplay lat={lat} />;
+  } else {
+    content = <Spinner message="Please accept location request" />;
+  }
 
-    // The lifecycle is like this -> constructor - render - commentDidMount - commentDidUpdate - commentWillUnmount
- 
-    componentDidMount() { // this is a good place to load data
+  return <div className="border red">{content}</div>;
+};
 
-        window.navigator.geolocation.getCurrentPosition(
-            position => {
-                // we call setState to update our state
-                this.setState({ lat: position.coords.latitude,})
-            }, // success callback 
-            err => this.setState({ erroMessage: err.message }) // error callback
-        )
+// class App extends React.Component {
+//   state = { lat: null, erroMessage: "" };
 
-    }
+//   // The lifecycle is like this -> constructor - render - commentDidMount - commentDidUpdate - commentWillUnmount
 
-    componentDidUpdate() {
-        console.log('my component was just updated - rerendered')
-    }
+//   componentDidUpdate() {
+//     console.log("my component was just updated - rerendered");
+//   }
 
-    renderContent() {
-        
-        if(this.state.erroMessage && !this.state.lat) {
-            return <div>Error: {this.state.erroMessage}</div>
-        }
+//   renderContent() {
+//     if (erroMessage && !lat) {
+//       return <div>Error: {erroMessage}</div>;
+//     }
 
-        if (!this.state.erroMessage && this.state.lat) {
-            return <SeasonDisplay lat={this.state.lat}></SeasonDisplay> 
-        }
+//     if (erroMessage && lat) {
+//       return <SeasonDisplay lat={lat} />;
+//     }
 
-        return <Spinner message="Please accept location request"/>
+//     return;
+//   }
 
-    }
+//   // React requirement
+//   render() {
+//     return <div className="border red">{this.renderContent()}</div>;
+//   }
+// }
 
-    // React requirement
-    render() {
-
-        return (
-            <div className="border red">
-                {this.renderContent()}
-            </div>
-        )
-        
-    }
-}
-
-ReactDom.render( 
-    <App/>, 
-    document.querySelector('#root')
-)
- 
+ReactDom.render(<App />, document.querySelector("#root"));
